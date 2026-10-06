@@ -1,0 +1,2 @@
+const {json,getServers}=require("./_lib");
+module.exports=async(req,res)=>{if(req.method!=="GET")return json(res,405,{error:"Method not allowed"});try{const servers=await getServers();const checked=await Promise.all(servers.map(async s=>{let status="OFFLINE";try{const r=await fetch((s.url||"").replace(/\/$/,"")+"/api/health",{signal:AbortSignal.timeout(5000)});status=r.ok?"ONLINE":"OFFLINE"}catch{}return {...s,status}}));return json(res,200,{servers:checked})}catch(e){return json(res,500,{error:e.message})}};
